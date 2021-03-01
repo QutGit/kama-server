@@ -1,0 +1,8 @@
+name: chuanda
+port: 3001
+database:
+  host: "59.110.160.59"
+  user: "chuanda_zuolinju"
+  password: "SKMbmkm3EAErpzbW"
+  database: "chuanda_zuolinju"
+  port: 3306
