@@ -22,7 +22,7 @@ func GetDB() *gorm.DB {
 		// 	config.C.Database.Database,
 		// 	config.C.Database.Port,
 		// )
-		dns := "chuanda_zuolinju:SKMbmkm3EAErpzbW@tcp(59.110.160.59:3306)/chuanda_zuolinju?charset=utf8mb4&parseTime=True&loc=Local"
+		dns := "kama:W6rZj7ztkhCEGDf6@tcp(101.200.161.142:3306)/kama?charset=utf8mb4&parseTime=True&loc=Local"
 		conn, err := gorm.Open(mysql.Open(dns), &gorm.Config{
 			Logger: logger.Default.LogMode(logger.Info),
 		})

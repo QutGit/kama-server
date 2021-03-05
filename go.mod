@@ -40,7 +40,7 @@ require (
 	github.com/wanglihui/gorm-util v0.0.1
 	golang.org/x/crypto v0.0.0-20201002170205-7f63de1d35b0 // indirect
 	golang.org/x/net v0.0.0-20201010224723-4f7140c49acb // indirect
-	golang.org/x/sys v0.0.0-20210220050731-9a76102bfb43 // indirect
+	golang.org/x/sys v0.0.0-20210301091718-77cc2087c03b // indirect
 	golang.org/x/tools v0.0.0-20201014231627-1610a49f37af // indirect
 	google.golang.org/protobuf v1.25.0 // indirect
 	gopkg.in/ini.v1 v1.61.0 // indirect

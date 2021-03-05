@@ -1,4 +1,4 @@
-package example
+package webapi
 
 import (
 	"fmt"
@@ -25,6 +25,14 @@ type wpPosts struct {
 	Post_author  string `gorm:"column:post_author" json:"postAuthor"`
 	Post_date    string `gorm:"column:post_date" json:"postDate"`
 	Post_content string `gorm:"column:post_content" json:"postContent"`
+}
+
+type category struct {
+	TermId      string `gorm:"column:term_id" json:"termId"`
+	Name        string `gorm:"column:name" json:"name"`
+	Description string `gorm:"column:description" json:"description"`
+	IconUrl     string `gorm:"column:icon_url;" json:"iconUrl"`
+	Slug        string `gorm:"column:slug" json:"slug"`
 }
 
 func (m *wpPosts) String() string {

@@ -1,13 +1,14 @@
-package example
+package webapi
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/magiconair/properties/assert"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/gin-gonic/gin"
+	"github.com/magiconair/properties/assert"
 )
 
 func getHttpHandler() http.Handler {
@@ -23,7 +24,7 @@ func getHttpHandler() http.Handler {
 
 func TestExampleLinkTrace(t *testing.T) {
 	app := getHttpHandler()
-	req := httptest.NewRequest("GET", "/example/test/link-trace", nil)
+	req := httptest.NewRequest("GET", "/webapi/test/link-trace", nil)
 	w := httptest.NewRecorder()
 	app.ServeHTTP(w, req)
 	resp := w.Result()
@@ -33,7 +34,7 @@ func TestExampleLinkTrace(t *testing.T) {
 
 func TestExampleCreate(t *testing.T) {
 	app := getHttpHandler()
-	req := httptest.NewRequest("POST", "/example/", strings.NewReader("{\"name\":\"test\"}"))
+	req := httptest.NewRequest("POST", "/webapi/", strings.NewReader("{\"name\":\"test\"}"))
 	req.Header.Set("UID", "1")
 	req.Header.Set("content-type", "application/json")
 	w := httptest.NewRecorder()

@@ -11,9 +11,9 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 
 	// _ "golang-started/docs"
-	"golang-started/example"
 	"golang-started/httperror"
 	"golang-started/lib/opentracing"
+	"golang-started/modules/webapi"
 	"log"
 	"net/http"
 	"os"
@@ -88,17 +88,9 @@ func GetApp() *gin.Engine {
 	r.Use(opentracing.GinOpentracingMiddleware())
 	r.Use(httperror.Middleware())
 	//装配service,controller,router
-	router := &example.Route{
-		C: example.Controller{Service: &example.Service{}},
+	router := &webapi.Route{
+		C: webapi.Controller{Service: &webapi.Service{}},
 	}
-	// k8s 存活检测
-	r.GET("/health", func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, gin.H{
-			"name":    "teacher-example",
-			"version": "x",
-			"status":  time.Now(),
-		})
-	})
 	router.MountRoute(r)
 	urlStr := fmt.Sprintf("/swagger/doc.json")
 	swaggerConfig := ginSwagger.URL(urlStr)

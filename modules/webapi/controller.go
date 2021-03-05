@@ -1,8 +1,7 @@
-package example
+package webapi
 
 import (
 	"errors"
-	"fmt"
 	"golang-started/dto"
 	"golang-started/httperror"
 	"golang-started/lib/opentracing"
@@ -62,26 +61,6 @@ func (that *Controller) TestLinkTrace(ctx *gin.Context) {
 	ctxNew := ctx.Request.Context()
 	httpReq, _ := http.NewRequest("GET", "http://localhost:3002/health", nil)
 	opentracing.DoWithLinkTrace(ctxNew, httpReq)
-	//span , ctxNew := opentracing.StartSpanFromContext(ctxNew, "/health")
-	//defer span.Finish()
-	//ext.SpanKindRPCClient.Set(span)
-	//ext.HTTPMethod.Set(span, "GET")
-	//ext.HTTPUrl.Set(span, "http://localhost:3002/health")
-
-	////httptrace.ClientTrace{}
-	//opentracing.GlobalTracer().Inject(
-	//	span.Context(),
-	//	opentracing.HTTPHeaders,
-	//	opentracing.HTTPHeadersCarrier(httpReq.Header))
-	//resp, err := c.Do(httpReq)
-	//if err != nil {
-	//	span.SetTag(string(ext.Error), true)
-	//} else {
-	//	if resp.StatusCode >= 400 {
-	//		span.SetTag(string(ext.Error), true)
-	//	}
-	//	span.SetTag(string(ext.HTTPStatusCode), resp.StatusCode)
-	//}
 	ctx.JSON(http.StatusOK, "ok")
 }
 
@@ -100,9 +79,9 @@ func (that *Controller) GetOne(ctx *gin.Context) {
 	dto := &GetDto{}
 	err := ctx.BindUri(dto)
 	if err != nil {
-		fmt.Println("=======")
 		panic(err)
 	}
+	// 调用service
 	_, m, err := that.Service.Get(ctx, dto.ID)
 	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
 		panic(httperror.BadRequest("文章内容不存在", 1001))
@@ -111,4 +90,26 @@ func (that *Controller) GetOne(ctx *gin.Context) {
 		panic(httperror.InternalError(err.Error(), 1002))
 	}
 	ctx.JSON(http.StatusOK, m)
+}
+
+// 获取分类目录
+func (that *Controller) GetCategory(ctx *gin.Context) {
+	// 调用service
+	_, m, err := that.Service.GetCategory(ctx)
+	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
+		panic(httperror.BadRequest("分类目录不存在", 1001))
+	}
+	if err != nil {
+		panic(httperror.InternalError(err.Error(), 1002))
+	}
+	data := struct {
+		Code int        `json:"code"`
+		Msg  string     `json:"msg"`
+		List []category `json:"list"`
+	}{
+		Code: 0,
+		Msg:  "success",
+		List: m,
+	}
+	ctx.JSON(http.StatusOK, data)
 }

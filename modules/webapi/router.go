@@ -1,4 +1,4 @@
-package example
+package webapi
 
 import (
 	"github.com/gin-gonic/gin"
@@ -11,13 +11,10 @@ type Route struct {
 
 // MountRoute 挂在路由信息
 func (that *Route) MountRoute(r *gin.Engine) {
-	g := r.Group("/example")
-	// 创建课件
-	g.POST("/", that.C.Create)
-	g.GET("/test/link-trace", that.C.TestLinkTrace)
-	g.GET("/test/one/:id", that.C.GetOne)
-	// 查询课件
-	g.GET("/id-:id", that.C.GetOne)
+	g := r.Group("/webapi")
+	// g.GET("/test/link-trace", that.C.TestLinkTrace)
+
+	g.GET("/categorys", that.C.GetCategory)
 	g.GET("/testok/:name/*action", func(c *gin.Context) {
 		// c.String(http.StatusOK, "test is ok")
 		// params 参数

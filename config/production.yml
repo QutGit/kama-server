@@ -2,7 +2,7 @@ name: chuanda
 port: 3301
 database:
   host: "101.200.161.142"
-  user: "zuolinju_com"
-  password: "hC4ahYYKJP8n75iD"
-  database: "zuolinju_com"
+  user: "kama"
+  password: "W6rZj7ztkhCEGDf6"
+  database: "kama"
   port: 3306
