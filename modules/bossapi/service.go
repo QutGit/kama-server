@@ -50,3 +50,10 @@ func (that *Service) GetArticles(ctx context.Context, param *ArticleParam) (cont
 		List:  arts,
 	}, nil
 }
+
+// 删除文章
+func (that *Service) DeleteArticle(ctx context.Context, id string) (context.Context, error) {
+	var article Article
+	relult := db.GetDB().Table("wp_list").Where(map[string]interface{}{"id": id}).Delete(&article)
+	return ctx, relult.Error
+}

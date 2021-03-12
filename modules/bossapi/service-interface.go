@@ -8,4 +8,5 @@ type ServiceInterface interface {
 	GetCategory(ctx context.Context) (context.Context, []category, error)
 	CreateArticle(ctx context.Context, a []*Article) (context.Context, []*Article, error)
 	GetArticles(ctx context.Context, param *ArticleParam) (context.Context, *ArticleEntity, error)
+	DeleteArticle(ctx context.Context, id string) (context.Context, error)
 }

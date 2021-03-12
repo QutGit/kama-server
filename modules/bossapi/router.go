@@ -15,4 +15,5 @@ func (that *Route) MountRoute(r *gin.Engine) {
 	g.GET("/categorys", that.C.GetCategory)
 	g.POST("/create", that.C.CreateArticle)
 	g.GET("/articles", that.C.GetArticles)
+	g.DELETE("/delete", that.C.DeleteArticle)
 }

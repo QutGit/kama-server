@@ -185,3 +185,23 @@ func (that *Controller) GetArticles(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, data)
 }
+
+// 删除文章
+func (that *Controller) DeleteArticle(ctx *gin.Context) {
+	id := ctx.Query("id")
+	_, err := that.Service.DeleteArticle(ctx, id)
+	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
+		panic(httperror.BadRequest("删除失败", 1001))
+	}
+	if err != nil {
+		panic(httperror.InternalError(err.Error(), 1002))
+	}
+	data := struct {
+		Code int    `json:"code"`
+		Msg  string `json:"msg"`
+	}{
+		Code: 0,
+		Msg:  "success",
+	}
+	ctx.JSON(http.StatusOK, data)
+}
