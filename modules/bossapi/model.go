@@ -37,14 +37,14 @@ type Articles struct {
 }
 
 type ArticleEntity struct {
-	Total int      `json:"total"`
-	List  Articles `json:"list"`
+	Total int64      `json:"total"`
+	List  []Articles `json:"list"`
 }
 
 type ArticleParam struct {
 	UserId string `gorm:"column:user_id" json:"userId"`
-	Limit  int    `json:"limit"`
-	Offset int    `json:"offset"`
+	Limit  int64  `json:"limit"`
+	Offset int64  `json:"offset"`
 }
 
 func (m *category) String() string {

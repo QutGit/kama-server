@@ -2,11 +2,11 @@ package bossapi
 
 import (
 	"errors"
-	"fmt"
 	"golang-started/dto"
 	"golang-started/httperror"
 	"golang-started/lib/opentracing"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
@@ -159,10 +159,10 @@ func (that *Controller) CreateArticle(ctx *gin.Context) {
 // 获取文章列表
 func (that *Controller) GetArticles(ctx *gin.Context) {
 	id := ctx.DefaultQuery("id", "1")
-	// limit := ctx.DefaultQuery("limit", 1)
-	// offset := ctx.DefaultQuery("offset", 20)
-	limit := 1
-	offset := 20
+	lm := ctx.DefaultQuery("limit", "20")
+	os := ctx.DefaultQuery("offset", "0")
+	limit, err := strconv.ParseInt(lm, 10, 64)
+	offset, err := strconv.ParseInt(os, 10, 64)
 	param := ArticleParam{id, limit, offset}
 	// 调用service
 	_, m, err := that.Service.GetArticles(ctx, &param)
@@ -178,11 +178,10 @@ func (that *Controller) GetArticles(ctx *gin.Context) {
 		Msg   string     `json:"msg"`
 		List  []Articles `json:"list"`
 	}{
-		Code: 0,
-		Msg:  "success",
-		// Total: m.total,
-		// List:  m.list,
+		Code:  0,
+		Msg:   "success",
+		Total: int(m.Total),
+		List:  m.List,
 	}
-	fmt.Println(m)
 	ctx.JSON(http.StatusOK, data)
 }

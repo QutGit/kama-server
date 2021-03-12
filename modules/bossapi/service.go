@@ -2,7 +2,6 @@ package bossapi
 
 import (
 	"context"
-	"fmt"
 	"golang-started/db"
 )
 
@@ -44,12 +43,10 @@ func (that *Service) GetArticles(ctx context.Context, param *ArticleParam) (cont
 		arts = make([]Articles, 0)
 	)
 	var count int64
-	list := db.GetDB().Table("wp_list").Limit(param.Limit).Offset(param.Offset).Where(map[string]interface{}{"user_id": param.UserId}).Find(&arts)
-	total := db.GetDB().Table("wp_list").Count(&count)
-	fmt.Println("**************************")
-	fmt.Println(&total)
-	fmt.Println(&list)
-	fmt.Println("**************************")
-	// result := ArticleEntity{total, arts}
-	return ctx, nil, list.Error
+	_ = db.GetDB().Table("wp_list").Limit(int(param.Limit)).Offset(int(param.Offset)).Where(map[string]interface{}{"user_id": param.UserId}).Find(&arts)
+	_ = db.GetDB().Table("wp_list").Where(map[string]interface{}{"user_id": param.UserId}).Count(&count)
+	return ctx, &ArticleEntity{
+		Total: count,
+		List:  arts,
+	}, nil
 }
