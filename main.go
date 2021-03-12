@@ -13,6 +13,7 @@ import (
 	// _ "golang-started/docs"
 	"golang-started/httperror"
 	"golang-started/lib/opentracing"
+	"golang-started/modules/bossapi"
 	"golang-started/modules/webapi"
 	"log"
 	"net/http"
@@ -54,13 +55,31 @@ func main() {
 
 	// The context is used to inform the server it has 5 seconds to finish
 	// the request it is currently handling
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Second)
 	defer cancel()
 	if err := srv.Shutdown(ctx); err != nil {
 		log.Fatal("Server forced to shutdown:", err)
 	}
 
 	log.Println("Server exiting")
+}
+
+func Cors() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		method := c.Request.Method
+		origin := c.Request.Header.Get("Origin")
+		if origin != "" {
+			c.Header("Access-Control-Allow-Origin", "*")
+			c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+			c.Header("Access-Control-Allow-Headers", "Content-Type,AccessToken,X-CSRF-Token, Authorization")
+			c.Header("Access-Control-Allow-Credentials", "true")
+			c.Set("content-type", "application/json")
+		}
+		if method == "OPTIONS" {
+			c.AbortWithStatus(http.StatusNoContent)
+		}
+		c.Next()
+	}
 }
 
 func GetApp() *gin.Engine {
@@ -87,11 +106,18 @@ func GetApp() *gin.Engine {
 	// 增加链路追踪
 	r.Use(opentracing.GinOpentracingMiddleware())
 	r.Use(httperror.Middleware())
-	//装配service,controller,router
+	// cors解决跨域问题
+	r.Use(Cors())
+	// 装配webpai
 	router := &webapi.Route{
 		C: webapi.Controller{Service: &webapi.Service{}},
 	}
 	router.MountRoute(r)
+	// 装配bossapi
+	bossRouter := &bossapi.Route{
+		C: bossapi.Controller{Service: &bossapi.Service{}},
+	}
+	bossRouter.MountRoute(r)
 	urlStr := fmt.Sprintf("/swagger/doc.json")
 	swaggerConfig := ginSwagger.URL(urlStr)
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, swaggerConfig))
