@@ -242,7 +242,8 @@ func (that *Controller) UpdateArticle(ctx *gin.Context) {
 	title := ctx.Request.PostFormValue("title")
 	termId := ctx.Request.PostFormValue("termId")
 	description := ctx.Request.PostFormValue("description")
-	_, err := that.Service.UpdateArticle(ctx, id, termId, title, description)
+	updateTime := time.Now().String()
+	_, err := that.Service.UpdateArticle(ctx, id, termId, title, description, updateTime)
 	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
 		panic(httperror.BadRequest("更新失败", 1001))
 	}

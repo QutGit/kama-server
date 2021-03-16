@@ -10,5 +10,5 @@ type ServiceInterface interface {
 	GetArticles(ctx context.Context, param *ArticleParam) (context.Context, *ArticleEntity, error)
 	DeleteArticle(ctx context.Context, id string) (context.Context, error)
 	RecoverArticle(ctx context.Context, id string) (context.Context, error)
-	UpdateArticle(ctx context.Context, id string, termId string, title string, description string) (context.Context, error)
+	UpdateArticle(ctx context.Context, id string, termId string, title string, description string, updateTime string) (context.Context, error)
 }

@@ -80,7 +80,7 @@ func (that *Service) RecoverArticle(ctx context.Context, id string) (context.Con
 }
 
 // 修改文章
-func (that *Service) UpdateArticle(ctx context.Context, id string, termId string, title string, description string) (context.Context, error) {
-	relult := db.GetDB().Table("wp_list").Where(map[string]interface{}{"id": id}).Updates(map[string]interface{}{"term_id": termId, "title": title, "description": description})
+func (that *Service) UpdateArticle(ctx context.Context, id string, termId string, title string, description string, updateTime string) (context.Context, error) {
+	relult := db.GetDB().Table("wp_list").Where(map[string]interface{}{"id": id}).Updates(map[string]interface{}{"term_id": termId, "title": title, "description": description, "update_time": updateTime})
 	return ctx, relult.Error
 }
