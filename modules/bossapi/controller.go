@@ -7,6 +7,7 @@ import (
 	"golang-started/lib/opentracing"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
@@ -119,9 +120,12 @@ func (that *Controller) GetCategory(ctx *gin.Context) {
 func (that *Controller) CreateArticle(ctx *gin.Context) {
 	title := ctx.Request.PostFormValue("title")
 	termId := ctx.Request.PostFormValue("termId")
+	description := ctx.Request.PostFormValue("description")
+	createTime := time.Now().String()
+	userId := "1"
 
 	// 错误处理
-	if err := ctx.Request.ParseMultipartForm(500 * 1000); err != nil {
+	if err := ctx.Request.ParseMultipartForm(1000 * 1000); err != nil {
 		panic(err)
 	}
 	files := ctx.Request.MultipartForm.File["files"]
@@ -137,7 +141,7 @@ func (that *Controller) CreateArticle(ctx *gin.Context) {
 		key, _ := opentracing.Upload(file, filename, v.Size)
 		// 组装对象 存数据库
 		fileUrl := "https://qiniu.zuolinju.com/" + key
-		fileObj := Article{termId, title, fileUrl, "1"}
+		fileObj := Article{"", termId, title, fileUrl, userId, description, createTime, createTime, 0}
 		list = append(list, &fileObj)
 	}
 
@@ -163,7 +167,13 @@ func (that *Controller) GetArticles(ctx *gin.Context) {
 	os := ctx.DefaultQuery("offset", "0")
 	limit, err := strconv.ParseInt(lm, 10, 64)
 	offset, err := strconv.ParseInt(os, 10, 64)
-	param := ArticleParam{id, limit, offset}
+	title := ctx.DefaultQuery("title", "")
+	startTime := ctx.DefaultQuery("startTime", "")
+	endTime := ctx.DefaultQuery("endTime", "")
+	termId := ctx.DefaultQuery("termId", "")
+	deleted := ctx.DefaultQuery("deleted", "")
+
+	param := ArticleParam{id, title, startTime, endTime, termId, deleted, limit, offset}
 	// 调用service
 	_, m, err := that.Service.GetArticles(ctx, &param)
 	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
@@ -192,6 +202,49 @@ func (that *Controller) DeleteArticle(ctx *gin.Context) {
 	_, err := that.Service.DeleteArticle(ctx, id)
 	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
 		panic(httperror.BadRequest("删除失败", 1001))
+	}
+	if err != nil {
+		panic(httperror.InternalError(err.Error(), 1002))
+	}
+	data := struct {
+		Code int    `json:"code"`
+		Msg  string `json:"msg"`
+	}{
+		Code: 0,
+		Msg:  "success",
+	}
+	ctx.JSON(http.StatusOK, data)
+}
+
+// 恢复文章
+func (that *Controller) RecoverArticle(ctx *gin.Context) {
+	id := ctx.Query("id")
+	_, err := that.Service.RecoverArticle(ctx, id)
+	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
+		panic(httperror.BadRequest("恢复失败", 1001))
+	}
+	if err != nil {
+		panic(httperror.InternalError(err.Error(), 1002))
+	}
+	data := struct {
+		Code int    `json:"code"`
+		Msg  string `json:"msg"`
+	}{
+		Code: 0,
+		Msg:  "success",
+	}
+	ctx.JSON(http.StatusOK, data)
+}
+
+// 更新文章
+func (that *Controller) UpdateArticle(ctx *gin.Context) {
+	id := ctx.Request.PostFormValue("id")
+	title := ctx.Request.PostFormValue("title")
+	termId := ctx.Request.PostFormValue("termId")
+	description := ctx.Request.PostFormValue("description")
+	_, err := that.Service.UpdateArticle(ctx, id, termId, title, description)
+	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
+		panic(httperror.BadRequest("更新失败", 1001))
 	}
 	if err != nil {
 		panic(httperror.InternalError(err.Error(), 1002))

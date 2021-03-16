@@ -43,8 +43,24 @@ func (that *Service) GetArticles(ctx context.Context, param *ArticleParam) (cont
 		arts = make([]Articles, 0)
 	)
 	var count int64
-	_ = db.GetDB().Table("wp_list").Limit(int(param.Limit)).Offset(int(param.Offset)).Where(map[string]interface{}{"user_id": param.UserId}).Find(&arts)
-	_ = db.GetDB().Table("wp_list").Where(map[string]interface{}{"user_id": param.UserId}).Count(&count)
+	Db := db.GetDB().Table("wp_list")
+	if param.UserId != "" {
+		Db.Where(map[string]interface{}{"user_id": param.UserId})
+	}
+	if param.Deleted != "" {
+		Db.Where(map[string]interface{}{"deleted": param.Deleted})
+	}
+	if param.TermId != "" {
+		Db.Where(map[string]interface{}{"term_id": param.TermId})
+	}
+	if param.StartTime != "" && param.EndTime != "" {
+		Db.Where("create_time BETWEEN ? AND ?", param.StartTime, param.EndTime)
+	}
+	if param.Title != "" {
+		Db.Where("title LIKE ?", "%"+param.Title+"%")
+	}
+	_ = Db.Count(&count)
+	_ = Db.Limit(int(param.Limit)).Offset(int(param.Offset)).Order("create_time desc").Find(&arts)
 	return ctx, &ArticleEntity{
 		Total: count,
 		List:  arts,
@@ -53,7 +69,18 @@ func (that *Service) GetArticles(ctx context.Context, param *ArticleParam) (cont
 
 // 删除文章
 func (that *Service) DeleteArticle(ctx context.Context, id string) (context.Context, error) {
-	var article Article
-	relult := db.GetDB().Table("wp_list").Where(map[string]interface{}{"id": id}).Delete(&article)
+	relult := db.GetDB().Table("wp_list").Where(map[string]interface{}{"id": id}).Update("deleted", 1)
+	return ctx, relult.Error
+}
+
+// 恢复文章
+func (that *Service) RecoverArticle(ctx context.Context, id string) (context.Context, error) {
+	relult := db.GetDB().Table("wp_list").Where(map[string]interface{}{"id": id}).Update("deleted", 0)
+	return ctx, relult.Error
+}
+
+// 修改文章
+func (that *Service) UpdateArticle(ctx context.Context, id string, termId string, title string, description string) (context.Context, error) {
+	relult := db.GetDB().Table("wp_list").Where(map[string]interface{}{"id": id}).Updates(map[string]interface{}{"term_id": termId, "title": title, "description": description})
 	return ctx, relult.Error
 }
