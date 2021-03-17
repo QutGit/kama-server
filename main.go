@@ -55,7 +55,7 @@ func main() {
 
 	// The context is used to inform the server it has 5 seconds to finish
 	// the request it is currently handling
-	ctx, cancel := context.WithTimeout(context.Background(), 5000*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 50000*time.Second)
 	defer cancel()
 	if err := srv.Shutdown(ctx); err != nil {
 		log.Fatal("Server forced to shutdown:", err)
